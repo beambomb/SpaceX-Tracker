@@ -6,7 +6,6 @@ import L from 'leaflet';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-// Fix for default Leaflet icon issue in React
 let DefaultIcon = L.icon({
   iconUrl: markerIcon,
   shadowUrl: markerShadow,
@@ -25,13 +24,11 @@ function App() {
   const [selectedLaunch, setSelectedLaunch] = useState(null);
 
   useEffect(() => {
-    // Fetch both launches and launchpads concurrently
     Promise.all([
       fetch('https://api.spacexdata.com/v4/launches').then(res => res.json()),
       fetch('https://api.spacexdata.com/v4/launchpads').then(res => res.json())
     ])
     .then(([launchesData, launchpadsData]) => {
-      // Create a dictionary for launchpads O(1) lookup
       const padsMap = launchpadsData.reduce((acc, pad) => ({ ...acc, [pad.id]: pad }), {});
       setLaunchpads(padsMap);
 
@@ -45,7 +42,6 @@ function App() {
     });
   }, []);
 
-  // Extract unique years for the timeline
   const availableYears = ['All', ...Array.from(new Set(launches.map(l => new Date(l.date_utc).getFullYear()))).sort((a, b) => b - a)];
 
   const filteredLaunches = launches.filter(launch => {
@@ -66,7 +62,6 @@ function App() {
     <div className="min-h-screen p-6 md:p-12 font-sans selection:bg-blue-500/30 relative">
       <div className="max-w-7xl mx-auto">
         
-        {/* Header Section */}
         <header className="mb-8 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-blue-600/20 rounded-2xl border border-blue-500/30 shadow-[0_0_20px_rgba(59,130,246,0.3)]">
@@ -99,7 +94,6 @@ function App() {
           </div>
         </header>
 
-        {/* Timeline Visualization */}
         {!loading && (
           <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
             <h3 className="text-gray-400 text-sm font-medium mb-3 flex items-center gap-2">
@@ -173,12 +167,10 @@ function App() {
           </div>
         )}
 
-        {/* Modal Overlay */}
         {selectedLaunch && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
             <div className={`${glassStyle} bg-[#0a0a0a]/90 w-full max-w-5xl max-h-[90vh] rounded-2xl overflow-hidden flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.8)] border-gray-800 relative`}>
               
-              {/* Modal Header */}
               <div className="flex justify-between items-center p-6 border-b border-white/10 bg-white/5">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-white/5 rounded-lg p-2 border border-white/10">
@@ -198,10 +190,8 @@ function App() {
                 </button>
               </div>
 
-              {/* Modal Body (Scrollable) */}
               <div className="p-6 overflow-y-auto custom-scrollbar flex flex-col gap-8">
                 
-                {/* Description */}
                 {selectedLaunch.details && (
                   <div>
                     <h3 className="text-lg font-semibold mb-2 text-blue-400 flex items-center gap-2">Mission Overview</h3>
@@ -210,16 +200,12 @@ function App() {
                 )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {/* Map Section */}
                   <div className="flex flex-col">
                     <h3 className="text-lg font-semibold mb-3 text-blue-400 flex items-center gap-2">
                       <MapPin className="w-5 h-5" /> Launchpad Location
                     </h3>
                     {launchpads[selectedLaunch.launchpad] ? (
                       <div className="h-[350px] w-full rounded-xl overflow-hidden border border-white/10 shadow-inner relative z-10">
-                        {/* 
-                          Using CartoDB Dark Matter tile layer for a sleek dark mode map 
-                        */}
                         <MapContainer 
                           center={[launchpads[selectedLaunch.launchpad].latitude, launchpads[selectedLaunch.launchpad].longitude]} 
                           zoom={10} 
@@ -249,7 +235,6 @@ function App() {
                     )}
                   </div>
 
-                  {/* Webcast Section */}
                   <div className="flex flex-col">
                     <h3 className="text-lg font-semibold mb-3 text-red-400 flex items-center gap-2">
                       <PlayCircle className="w-5 h-5" /> Webcast Replay
